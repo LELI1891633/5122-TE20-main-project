@@ -9,21 +9,14 @@ sequenceDiagram
   participant FE as Frontend (Static Hosting/CDN)
   participant API as API Gateway
   participant L as AWS Lambda
-  participant DB as DynamoDB (optional)
-  participant S3 as S3 (optional)
+  participant DB as MySQL Database
 
   U->>FE: Open website (GET index.html, JS, CSS)
   FE-->>U: Return static assets (HTML, JS, CSS)
 
   U->>API: Request /hello
   API->>L: Trigger Lambda (event)
-  alt Needs data
-    L->>DB: Query / Write
-    DB-->>L: Data response
-  end
-  alt Needs file storage
-    L->>S3: Read / Write file
-    S3-->>L: File response
-  end
+  L->>DB: Query / Insert / Update
+  DB-->>L: Return data
   L-->>API: { statusCode, body(JSON) }
   API-->>U: JSON response
