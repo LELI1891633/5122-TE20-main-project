@@ -1,22 +1,12 @@
-## System Diagram
+## High-level Architecture
 
-The diagram below combines both the architecture (frontend, backend, database) and the request flow (user interactions and API calls).
+The diagram below shows the core components and how they connect at a glance.
 
 ```mermaid
-sequenceDiagram
-  autonumber
-  participant U as User Browser (Vue)
-  participant FE as Frontend (Static Hosting/CDN)
-  participant API as API Gateway
-  participant L as AWS Lambda
-  participant DB as MySQL Database
-
-  U->>FE: Open website (GET index.html, JS, CSS)
-  FE-->>U: Return static assets (HTML, JS, CSS)
-
-  U->>API: Request /hello
-  API->>L: Trigger Lambda (event)
-  L->>DB: Query / Insert / Update
-  DB-->>L: Return data
-  L-->>API: { statusCode, body(JSON) }
-  API-->>U: JSON response
+graph TD
+  U[User Browser] -->|HTTP/HTTPS| FE[Vue Frontend<br/>Static Hosting: GitHub Pages / Netlify / AWS Amplify]
+  FE -->|Fetch API| APIGW[Amazon API Gateway]
+  APIGW --> LBD[AWS Lambda<br/>Business Logic]
+  LBD --> MYSQL[(MySQL Database)]
+  classDef svc fill:#eef,stroke:#88a,stroke-width:1px,color:#222;
+  class FE,APIGW,LBD,MYSQL svc;
