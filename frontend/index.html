@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vue Minimal Frontend</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>Hello, Vue Frontend </h1>
+    <button @click="callApi">Call Backend</button>
+    <p>Response: {{ msg }}</p>
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://example.com/dev";
+
+    const { createApp, ref } = Vue
+    createApp({
+      setup() {
+        const msg = ref("No response yet")
+        async function callApi() {
+          try {
+            const res = await fetch(BACKEND_URL)
+            const data = await res.json()
+            msg.value = data.message
+          } catch (e) {
+            msg.value = "Error: " + e
+          }
+        }
+        return { msg, callApi }
+      }
+    }).mount('#app')
+  </script>
+</body>
+</html>
