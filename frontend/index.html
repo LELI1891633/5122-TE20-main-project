@@ -1,36 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Vue Minimal Frontend</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-</head>
-<body>
-  <div id="app">
-    <h1>Hello, Vue Frontend </h1>
-    <button @click="callApi">Call Backend</button>
-    <p>Response: {{ msg }}</p>
-  </div>
-
-  <script>
-    const BACKEND_URL = "https://example.com/dev";
-
-    const { createApp, ref } = Vue
-    createApp({
-      setup() {
-        const msg = ref("No response yet")
-        async function callApi() {
-          try {
-            const res = await fetch(BACKEND_URL)
-            const data = await res.json()
-            msg.value = data.message
-          } catch (e) {
-            msg.value = "Error: " + e
-          }
-        }
-        return { msg, callApi }
-      }
-    }).mount('#app')
-  </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Office Ease</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
