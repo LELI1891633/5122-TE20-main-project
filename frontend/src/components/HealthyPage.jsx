@@ -1,14 +1,27 @@
-import React from 'react'
-import './HealthyPage.css'
+import React, { useState } from 'react';
+import HealthyDesk from './HealthyDesk';
+import './HealthyPage.css';
 
 const HealthyPage = () => {
+  const [screen, setScreen] = useState('home'); // <-- fixed
+
+  if (screen === 'desk') {
+    return <HealthyDesk onBack={() => setScreen('home')} />;
+  }
+
   return (
     <div className="healthy-container">
       <div className="background-image"></div>
       <div className="content-wrapper">
         <div className="cards-container">
           {/* Healthy Space Card */}
-          <div className="card healthy-space">
+          <div
+            className="card healthy-space"
+            onClick={() => setScreen('desk')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setScreen('desk')}
+          >
             <div className="card-background desk-bg"></div>
             <div className="card-overlay">
               <h2>Healthy Space</h2>
@@ -25,7 +38,7 @@ const HealthyPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default HealthyPage
+export default HealthyPage;
