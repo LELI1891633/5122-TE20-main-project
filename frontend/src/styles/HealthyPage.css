@@ -1,0 +1,31 @@
+.healthy-container {
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+.card {
+  width: 280px;
+  height: 180px;
+  border-radius: 16px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+.card:hover { transform: scale(1.05); }
+.card.desk { background-image: url('/images/desk.jpg'); }
+.card.you { background-image: url('/images/health.jpg'); }
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+}
