@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import HealthyDesk from './HealthyDesk';
+import HealthInfo from './HealthInfo';
 import './HealthyPage.css';
 
 const HealthyPage = () => {
@@ -7,6 +8,10 @@ const HealthyPage = () => {
 
   if (screen === 'desk') {
     return <HealthyDesk onBack={() => setScreen('home')} />;
+  }
+
+  if (screen === 'info') {
+    return <HealthInfo onBack={() => setScreen('desk')} />;
   }
 
   return (
