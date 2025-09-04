@@ -110,7 +110,12 @@ const HealthyYou = () => {
           {healthTips.map(({ icon: Icon, title, description, tips, color }, index) => (
             <div 
               key={title}
-              className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+              className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+              onClick={() => {
+                if (title === "Eye Health") {
+                  navigate("/eye-health-analysis");
+                }
+              }}
             >
               {/* Card Header */}
               <div className={`bg-gradient-to-r ${colorClasses[color].split(' ')[0]} ${colorClasses[color].split(' ')[1]} p-6 text-white`}>
