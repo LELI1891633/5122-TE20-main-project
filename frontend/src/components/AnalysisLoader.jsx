@@ -37,7 +37,6 @@ const AnalysisLoader = ({ step = 0 }) => {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-lg p-8">
       <div className="text-center space-y-6">
-        {/* Animated Icon */}
         <motion.div
           className="flex justify-center"
           animate={{ rotate: 360 }}
@@ -48,13 +47,11 @@ const AnalysisLoader = ({ step = 0 }) => {
           </div>
         </motion.div>
 
-        {/* Progress Steps */}
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-slate-800">
             Analyzing Your Workspace
           </h3>
           
-          {/* Step Indicator */}
           <div className="flex justify-center space-x-2 mb-4">
             {steps.map((_, index) => (
               <motion.div
@@ -75,7 +72,6 @@ const AnalysisLoader = ({ step = 0 }) => {
             ))}
           </div>
 
-          {/* Current Step Text */}
           <motion.p
             key={step}
             className="text-slate-600"
@@ -86,11 +82,9 @@ const AnalysisLoader = ({ step = 0 }) => {
             {currentStep.text}
           </motion.p>
 
-          {/* Loading Spinner */}
           <LoadingSpinner />
         </div>
 
-        {/* Progress Bar */}
         <div className="w-full bg-slate-200 rounded-full h-2">
           <motion.div
             className="bg-gradient-to-r from-sky-500 to-blue-600 h-2 rounded-full"
@@ -100,7 +94,6 @@ const AnalysisLoader = ({ step = 0 }) => {
           />
         </div>
 
-        {/* Estimated Time */}
         <p className="text-sm text-slate-500">
           This will take just a moment...
         </p>
