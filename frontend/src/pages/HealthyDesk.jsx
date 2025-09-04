@@ -12,6 +12,9 @@ import {
   Coffee,
   ArrowRight
 } from "lucide-react";
+import { analyzeDeskSetup, calculateElbowHeight } from "../scripts/deskAnalyzer";
+import AnalysisLoader from "../components/AnalysisLoader";
+import { AnimatedAssistant } from "../components/AnimatedAssistant";
 
 
 /* --------------------------------------------------------------------------
@@ -36,10 +39,17 @@ const HealthyDesk = () => {
    *  - form: live, local-only (no persistence)
    *  - showTips: collapsible "How to estimate" section
    *  - submitted: controls layout (form-only vs. form + results)
+   *  - loading: controls analysis loading state
+   *  - loadingStep: current step in analysis process
+   *  - analysisResult: result from analysis script
    * ------------------------------------------------------------------------ */
   const [form, setForm] = useState(initialForm);
   const [showTips, setShowTips] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [assistantOpen, setAssistantOpen] = useState(true);
 
   /* ------------------------------------------------------------------------
    * Field helpers
@@ -54,93 +64,51 @@ const HealthyDesk = () => {
    * Derived elbow height (simple anthropometric estimate)
    * ------------------------------------------------------------------------ */
   const elbowHeight = useMemo(
-    () => Math.round(form.heightCm * 0.62),
+    () => calculateElbowHeight(form.heightCm),
     [form.heightCm]
   );
 
   /* ------------------------------------------------------------------------
-   * Scoring + verdict (static guidance, calculated on the fly)
-   * ------------------------------------------------------------------------ */
-  const { score, verdict, details } = useMemo(() => {
-    let s = 0;
-    const det = [];
-
-    if (form.screenDistanceCm >= 50 && form.screenDistanceCm <= 75) {
-      s += 10;
-      det.push({ ok: true, text: "Screen distance looks comfortable (50–75 cm)." });
-    } else {
-      det.push({ ok: false, text: "Adjust screen to ~50–75 cm to reduce strain." });
-    }
-
-    if (form.monitorTopAtEye === "yes") {
-      s += 10;
-      det.push({ ok: true, text: "Top of monitor around eye level." });
-    } else {
-      det.push({ ok: false, text: "Raise/lower monitor so the top is near eye level." });
-    }
-
-    if (form.keyboardAtElbow === "yes") {
-      s += 10;
-      det.push({ ok: true, text: "Keyboard at elbow height (~90° elbows)." });
-    } else {
-      det.push({
-        ok: false,
-        text: `Keyboard should be near elbow height (~${elbowHeight} cm for you).`,
-      });
-    }
-
-    if (form.feetSupported === "yes") {
-      s += 10;
-      det.push({ ok: true, text: "Feet supported (flat or footrest)." });
-    } else {
-      det.push({
-        ok: false,
-        text: "Use a footrest or adjust seat so feet are supported.",
-      });
-    }
-
-    if (form.chairLumbar === "yes") {
-      s += 10;
-      det.push({ ok: true, text: "Lower back supported." });
-    } else {
-      det.push({ ok: false, text: "Add a small lumbar cushion or adjust chair backrest." });
-    }
-
-    if (form.glare === "no") {
-      s += 5;
-      det.push({ ok: true, text: "Glare looks under control." });
-    } else {
-      det.push({ ok: false, text: "Reduce glare with blinds or reposition screen." });
-    }
-
-    if (form.breakEveryMins <= 30 && form.breakEveryMins >= 20) {
-      s += 10;
-      det.push({ ok: true, text: "Regular micro-breaks are on point." });
-    } else {
-      det.push({ ok: false, text: "Try breaks every 20–30 minutes." });
-    }
-
-    const max = 65;
-    const pct = Math.round((s / max) * 100);
-
-    let v = "Great";
-    if (pct < 70) v = "Needs Tuning";
-    if (pct < 45) v = "Adjust ASAP";
-
-    return { score: pct, verdict: v, details: det };
-  }, [form, elbowHeight]);
-
-  /* ------------------------------------------------------------------------
    * Handlers: submit & reset
    * ------------------------------------------------------------------------ */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+    setLoadingStep(0);
+    setSubmitted(false);
+    setAnalysisResult(null);
+
+    try {
+      // Simulate step progression
+      const stepInterval = setInterval(() => {
+        setLoadingStep(prev => {
+          if (prev < 2) return prev + 1;
+          clearInterval(stepInterval);
+          return prev;
+        });
+      }, 500);
+
+      // Perform analysis
+      const result = await analyzeDeskSetup(form);
+      
+      clearInterval(stepInterval);
+      setAnalysisResult(result);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      // Handle error - could show error message
+    } finally {
+      setLoading(false);
+      setLoadingStep(0);
+    }
   };
 
   const handleReset = () => {
     setForm(initialForm);
     setSubmitted(false);
+    setLoading(false);
+    setLoadingStep(0);
+    setAnalysisResult(null);
   };
 
   return (
@@ -148,11 +116,20 @@ const HealthyDesk = () => {
       {/* Header */}
       <header className="max-w-7xl mx-auto mb-8">
         <div className="text-center sm:text-left">
-          <div className="flex items-center justify-center sm:justify-start gap-3 mb-3">
-            <div className="bg-sky-600 p-2 rounded-lg">
-              <Monitor className="text-white" size={24} />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="bg-sky-600 p-2 rounded-lg">
+                <Monitor className="text-white" size={24} />
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-800">Healthy Desk</h1>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-800">Healthy Desk</h1>
+            <button
+              onClick={() => setAssistantOpen(true)}
+              className="flex items-center gap-2 bg-sky-100 hover:bg-sky-200 text-sky-700 px-4 py-2 rounded-lg transition-colors duration-200"
+            >
+              <Info size={18} />
+              <span className="hidden sm:inline">Get Help</span>
+            </button>
           </div>
           <p className="text-lg text-slate-600 max-w-2xl">
             Quick checklist to optimize your workstation setup for better health and productivity.
@@ -228,7 +205,7 @@ const HealthyDesk = () => {
           )}
         </div>
       </section>      {/* Main Content */}
-      <main className={`max-w-7xl mx-auto ${submitted ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : ""}`}>
+      <main className={`max-w-7xl mx-auto ${(submitted && !loading) ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : ""}`}>
         {/* Form */}
         <div className="bg-white border border-slate-200 rounded-2xl shadow-lg">
           <form onSubmit={handleSubmit} noValidate className="p-6 sm:p-8">
@@ -363,15 +340,17 @@ const HealthyDesk = () => {
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
               <button 
                 type="submit" 
-                className="flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200"
+                disabled={loading}
+                className="flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200"
               >
                 <CheckCircle size={18} />
-                Analyze Setup
+                {loading ? "Analyzing..." : "Analyze Setup"}
               </button>
               <button 
                 type="button" 
                 onClick={handleReset}
-                className="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-6 rounded-lg border border-slate-200 transition-colors duration-200"
+                disabled={loading}
+                className="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 disabled:bg-slate-50 disabled:cursor-not-allowed text-slate-700 font-medium py-3 px-6 rounded-lg border border-slate-200 transition-colors duration-200"
               >
                 <RotateCcw size={18} />
                 Reset Form
@@ -380,12 +359,17 @@ const HealthyDesk = () => {
           </form>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <AnalysisLoader step={loadingStep} />
+        )}
+
         {/* Results */}
-        {submitted && (
+        {submitted && !loading && analysisResult && (
           <div className="bg-white border border-slate-200 rounded-2xl shadow-lg p-6 sm:p-8" aria-live="polite">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <div className="relative w-20 h-20" role="img" aria-label={`Setup score ${score} percent`}>
+                <div className="relative w-20 h-20" role="img" aria-label={`Setup score ${analysisResult.score} percent`}>
                   <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
                     <path
                       className="fill-none stroke-slate-200 stroke-2"
@@ -393,23 +377,23 @@ const HealthyDesk = () => {
                     />
                     <path
                       className={`fill-none stroke-2 transition-all duration-1000 ${
-                        verdict === "Great" ? "stroke-green-500" : 
-                        verdict === "Needs Tuning" ? "stroke-yellow-500" : "stroke-red-500"
+                        analysisResult.verdictColor === "green" ? "stroke-green-500" : 
+                        analysisResult.verdictColor === "yellow" ? "stroke-yellow-500" : "stroke-red-500"
                       }`}
-                      strokeDasharray={`${score}, 100`}
+                      strokeDasharray={`${analysisResult.score}, 100`}
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center text-lg font-bold text-slate-800">
-                    {score}%
+                    {analysisResult.score}%
                   </div>
                 </div>
                 <div>
                   <div className={`text-2xl font-bold ${
-                    verdict === "Great" ? "text-green-600" : 
-                    verdict === "Needs Tuning" ? "text-yellow-600" : "text-red-600"
+                    analysisResult.verdictColor === "green" ? "text-green-600" : 
+                    analysisResult.verdictColor === "yellow" ? "text-yellow-600" : "text-red-600"
                   }`}>
-                    {verdict}
+                    {analysisResult.verdict}
                   </div>
                   <p className="text-sm text-slate-600">Workspace Assessment</p>
                 </div>
@@ -429,19 +413,26 @@ const HealthyDesk = () => {
             {/* Recommendations */}
             <div className="space-y-3 max-h-80 overflow-y-auto">
               <h4 className="font-semibold text-slate-800 mb-3">Recommendations:</h4>
-              {details.map((d, i) => (
+              {analysisResult.details.map((d, i) => (
                 <div 
                   key={i} 
                   className={`flex items-start gap-3 p-3 rounded-lg ${
-                    d.ok ? "bg-green-50 border border-green-200" : "bg-yellow-50 border border-yellow-200"
+                    d.ok ? "bg-green-50 border border-green-200" : 
+                    d.priority === "high" ? "bg-red-50 border border-red-200" :
+                    "bg-yellow-50 border border-yellow-200"
                   }`}
                 >
                   {d.ok ? (
                     <CheckCircle className="text-green-600 mt-0.5 flex-shrink-0" size={16} />
+                  ) : d.priority === "high" ? (
+                    <AlertTriangle className="text-red-600 mt-0.5 flex-shrink-0" size={16} />
                   ) : (
                     <AlertTriangle className="text-yellow-600 mt-0.5 flex-shrink-0" size={16} />
                   )}
-                  <p className={`text-sm ${d.ok ? "text-green-800" : "text-yellow-800"}`}>
+                  <p className={`text-sm ${
+                    d.ok ? "text-green-800" : 
+                    d.priority === "high" ? "text-red-800" : "text-yellow-800"
+                  }`}>
                     {d.text}
                   </p>
                 </div>
@@ -450,6 +441,25 @@ const HealthyDesk = () => {
           </div>
         )}
       </main>
+
+      {/* Animated Assistant */}
+      <AnimatedAssistant
+        open={assistantOpen}
+        name="Desk Health Assistant"
+        position="bottom-right"
+        accent="sky"
+        steps={[
+          { text: "Welcome to your desk health assessment! 🖥️" },
+          { text: "Fill out the form with your current setup details." },
+          { text: "Need help measuring? Check the 'How to estimate' tips above! 📏" },
+          { text: "Click 'Analyze Setup' when ready for your personalized recommendations." },
+          { text: "Your health and comfort are our priority! 💪" }
+        ]}
+        onClose={() => setAssistantOpen(false)}
+        onFinish={() => setAssistantOpen(false)}
+        width={380}
+        typingSpeed={25}
+      />
     </div>
   );
 };
