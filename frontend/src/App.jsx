@@ -7,7 +7,6 @@ import HealthyPage from "./pages/HealthyPage";
 import HealthyDesk from "./pages/HealthyDesk";
 import HealthyYou from "./pages/HealthyYou";
 import HealthInfo from "./pages/HealthInfo";
-import "./styles/global.css";
 
 function App() {
   return (

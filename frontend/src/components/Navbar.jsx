@@ -1,15 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./../styles/Navbar.css";
 
 const Navbar = () => {
   return (
-    <nav className="navbar">
-      <h1 className="logo">OfficeEase</h1>
-      <ul className="nav-links">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/healthy">Healthy Space</Link></li>
-        <li><Link to="/health-info">Health Info</Link></li>
+    <nav className="flex justify-between items-center bg-gray-900 p-3 px-6 text-white">
+      <h1 className="font-bold">OfficeEase</h1>
+      <ul className="list-none flex gap-4">
+        <li><Link to="/" className="text-white transition-colors duration-300 hover:text-blue-400">Home</Link></li>
+        <li><Link to="/healthy" className="text-white transition-colors duration-300 hover:text-blue-400">Healthy Space</Link></li>
+        <li><Link to="/health-info" className="text-white transition-colors duration-300 hover:text-blue-400">Health Info</Link></li>
       </ul>
     </nav>
   );

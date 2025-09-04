@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/HealthyDesk.css";
 
 
 /* --------------------------------------------------------------------------
@@ -133,23 +132,23 @@ const HealthyDesk = () => {
   };
 
   return (
-    <div className="hd-wrap">
+    <div className="min-h-screen p-8 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
       {/* --------------------------------------------------------------------
           Header (no info button here; it appears with results after submit)
          -------------------------------------------------------------------- */}
-      <header className="hd-header">
+      <header className="max-w-7xl mx-auto mb-4 grid grid-cols-1 gap-3">
         <div>
-          <h1 className="hd-title">Healthy Desk</h1>
-          <p className="hd-sub">Quick checklist for your workstation setup.</p>
+          <h1 className="text-3xl font-extrabold">Healthy Desk</h1>
+          <p className="text-sm text-slate-400 mt-1.5">Quick checklist for your workstation setup.</p>
         </div>
       </header>
 
       {/* --------------------------------------------------------------------
           Guidance: collapsible helper for estimating inputs
          -------------------------------------------------------------------- */}
-      <section className="hd-guidelines card">
+      <section className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl">
         <div
-          className="hd-guidelines-header"
+          className="cursor-pointer"
           onClick={() => setShowTips((v) => !v)}
           role="button"
           tabIndex={0}
@@ -157,11 +156,11 @@ const HealthyDesk = () => {
           aria-expanded={showTips}
         >
           <h2>How to estimate measurements</h2>
-          <span className={`chev ${showTips ? "open" : ""}`}>▾</span>
+          <span className={`transition-transform ${showTips ? "rotate-180" : ""}`}>▾</span>
         </div>
 
         {showTips && (
-          <div className={`hd-guidelines-body ${showTips ? "open" : ""}`}>
+          <div className={`transition-all duration-300 ${showTips ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
             <ul>
               <li>Screen distance: arm’s length (~50–75 cm).</li>
               <li>Monitor: top at eye level.</li>
@@ -178,11 +177,11 @@ const HealthyDesk = () => {
           Main: before submit → centered form only
                 after submit  → two columns (form + results)
          -------------------------------------------------------------------- */}
-      <main className={`hd-main ${submitted ? "submitted" : ""}`}>
+      <main className={`max-w-7xl mx-auto ${submitted ? "grid grid-cols-1 lg:grid-cols-2 gap-6" : ""}`}>
         {/* ------------------------------ Form ------------------------------ */}
-        <form className="card hd-form" onSubmit={handleSubmit} noValidate>
-          <div className="hd-grid">
-            <label className="hd-field">
+        <form className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-6" onSubmit={handleSubmit} noValidate>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label className="flex flex-col">
               <span>Your height (cm)</span>
               <input
                 type="number"
@@ -191,10 +190,11 @@ const HealthyDesk = () => {
                 value={form.heightCm}
                 onChange={onNumber("heightCm")}
                 aria-label="Your height in centimeters"
+                className="mt-1 p-2 bg-slate-700 border border-slate-600 rounded"
               />
             </label>
 
-            <label className="hd-field">
+            <label className="flex flex-col">
               <span>Screen distance (cm)</span>
               <input
                 type="range"
@@ -203,71 +203,77 @@ const HealthyDesk = () => {
                 value={form.screenDistanceCm}
                 onChange={onNumber("screenDistanceCm")}
                 aria-label="Screen distance in centimeters"
+                className="mt-1"
               />
-              <div className="range-readout">{form.screenDistanceCm} cm</div>
+              <div className="text-sm text-slate-400 mt-1">{form.screenDistanceCm} cm</div>
             </label>
 
-            <label className="hd-field">
+            <label className="flex flex-col">
               <span>Top of monitor at eye level?</span>
               <select
                 value={form.monitorTopAtEye}
                 onChange={onSelect("monitorTopAtEye")}
                 aria-label="Top of monitor at eye level"
+                className="mt-1 p-2 bg-slate-700 border border-slate-600 rounded"
               >
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
               </select>
             </label>
 
-            <label className="hd-field">
+            <label className="flex flex-col">
               <span>Keyboard at elbow height?</span>
               <select
                 value={form.keyboardAtElbow}
                 onChange={onSelect("keyboardAtElbow")}
                 aria-label="Keyboard at elbow height"
+                className="mt-1 p-2 bg-slate-700 border border-slate-600 rounded"
               >
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
               </select>
             </label>
 
-            <label className="hd-field">
+            <label className="flex flex-col">
               <span>Feet supported?</span>
               <select
                 value={form.feetSupported}
                 onChange={onSelect("feetSupported")}
                 aria-label="Feet supported"
+                className="mt-1 p-2 bg-slate-700 border border-slate-600 rounded"
               >
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
               </select>
             </label>
 
-            <label className="hd-field">
+            <label className="flex flex-col">
               <span>Chair has lumbar support?</span>
               <select
                 value={form.chairLumbar}
                 onChange={onSelect("chairLumbar")}
                 aria-label="Chair lumbar support"
+                className="mt-1 p-2 bg-slate-700 border border-slate-600 rounded"
               >
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
               </select>
             </label>
 
-            <label className="hd-field">
+            <label className="flex flex-col">
               <span>Glare on screen?</span>
               <select
                 value={form.glare}
                 onChange={onSelect("glare")}
                 aria-label="Glare on screen"
+                className="mt-1 p-2 bg-slate-700 border border-slate-600 rounded"
               >
                 <option value="no">No</option>
                 <option value="yes">Yes</option>
               </select>
             </label>
 
-            <label className="hd-field">
+            <label className="flex flex-col">
               <span>Break every (minutes)</span>
               <input
                 type="range"
@@ -277,17 +283,18 @@ const HealthyDesk = () => {
                 value={form.breakEveryMins}
                 onChange={onNumber("breakEveryMins")}
                 aria-label="Break interval in minutes"
+                className="mt-1"
               />
-              <div className="range-readout">{form.breakEveryMins} min</div>
+              <div className="text-sm text-slate-400 mt-1">{form.breakEveryMins} min</div>
             </label>
           </div>
 
           {/* Form actions */}
-          <div className="form-actions">
-            <button type="submit" className="btn primary" aria-label="Submit form">
+          <div className="flex gap-4 mt-6">
+            <button type="submit" className="bg-blue-600 text-white p-3 rounded hover:bg-blue-700" aria-label="Submit form">
               Submit
             </button>
-            <button type="button" className="btn ghost" onClick={handleReset}>
+            <button type="button" className="bg-transparent text-slate-400 p-3 rounded border border-slate-600 hover:bg-slate-700" onClick={handleReset}>
               Reset
             </button>
           </div>
@@ -295,35 +302,35 @@ const HealthyDesk = () => {
 
         {/* ----------------------------- Results ---------------------------- */}
         {submitted && (
-          <section className="card hd-result" aria-live="polite">
-            <div className="score-row">
-              <div className="score">
-                <div className="score-ring" role="img" aria-label={`Setup score ${score} percent`}>
-                  <svg viewBox="0 0 36 36" className="circular-chart">
+          <section className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-6" aria-live="polite">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="relative w-20 h-20" role="img" aria-label={`Setup score ${score} percent`}>
+                  <svg viewBox="0 0 36 36" className="w-full h-full">
                     <path
-                      className="circle-bg"
+                      className="fill-none stroke-slate-600 stroke-2"
                       d="M18 2.0845
                          a 15.9155 15.9155 0 0 1 0 31.831
                          a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                     <path
-                      className="circle"
+                      className="fill-none stroke-blue-500 stroke-2 transition-all duration-500"
                       strokeDasharray={`${score}, 100`}
                       d="M18 2.0845
                          a 15.9155 15.9155 0 0 1 0 31.831
                          a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                   </svg>
-                  <div className="score-label">{score}%</div>
+                  <div className="absolute inset-0 flex items-center justify-center text-lg font-bold">{score}%</div>
                 </div>
-                <div className={`verdict ${verdict.replace(/\s/g, "").toLowerCase()}`}>
+                <div className={`text-lg font-semibold ${verdict === "Great" ? "text-green-400" : verdict === "Needs Tuning" ? "text-yellow-400" : "text-red-400"}`}>
                   {verdict}
                 </div>
               </div>
 
               {/* Info button (appears with results) */}
               <button
-                className="hd-info-btn"
+                className="border border-slate-600 bg-slate-700 text-white p-3 rounded-lg cursor-pointer hover:border-blue-400"
                 onClick={() => navigate("/health-info")}
                 aria-label="Open Health Info"
                 title="Official guidance & standards"
@@ -333,10 +340,10 @@ const HealthyDesk = () => {
             </div>
 
             {/* Scrollable tips */}
-            <div className="result-scroll">
-              <ul className="result-list">
+            <div className="max-h-60 overflow-y-auto">
+              <ul className="space-y-2">
                 {details.map((d, i) => (
-                  <li key={i} className={d.ok ? "ok" : "warn"}>
+                  <li key={i} className={d.ok ? "text-green-400" : "text-yellow-400"}>
                     {d.ok ? "✅" : "⚠️"} {d.text}
                   </li>
                 ))}
