@@ -1,11 +1,10 @@
 import React from "react";
-import "./../styles/Assistant.css";
 
 const Assistant = () => {
   return (
-    <div className="assistant">
-      <div className="assistant-avatar">🤖</div>
-      <div className="assistant-bubble">
+    <div className="fixed bottom-4 left-4 flex items-end gap-2 animate-bounce">
+      <div className="text-4xl">🤖</div>
+      <div className="bg-white p-2 rounded-lg shadow-lg text-sm">
         Hi! I’m your OfficeEase guide. I’ll help you explore this app 👋
       </div>
     </div>

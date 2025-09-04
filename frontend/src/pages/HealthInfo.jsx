@@ -1,9 +1,8 @@
 import React from "react";
-import "./../styles/HealthInfo.css";
 
 const HealthInfo = () => {
   return (
-    <div className="info-container">
+    <div className="p-4">
       <h1>Health Information</h1>
       <p>
         Here you’ll find workstation standards, eye health, and Vitamin D info from trusted government resources.

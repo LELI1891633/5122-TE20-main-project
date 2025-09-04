@@ -1,6 +1,9 @@
+@import 'tailwindcss';
+
 body {
   margin: 0;
-  padding: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+  background: #f4f6fa;
+  color: #222;
 }
+a { text-decoration: none; color: inherit; }
