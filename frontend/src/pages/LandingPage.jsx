@@ -26,13 +26,21 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="relative min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-sky-50 overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-orange-200/20 to-pink-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 right-0 w-80 h-80 bg-gradient-to-br from-sky-200/20 to-purple-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-gradient-to-br from-pink-200/20 to-orange-200/20 rounded-full blur-3xl"></div>
+      </div>
       {/* Hero Section */}
       <section className="relative px-4 pt-16 pb-20 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           {/* Main Hero Content */}
-          <div className="bg-gradient-to-br from-sky-600 to-sky-800 text-white rounded-3xl p-8 sm:p-12 lg:p-16 shadow-2xl border border-sky-200/20">
-            <div className="space-y-6">
+          <div className="relative bg-white/20 backdrop-blur-md text-white rounded-3xl p-8 sm:p-12 lg:p-16 shadow-2xl border border-white/30 overflow-hidden">
+            {/* Glass effect overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-sky-600/80 to-sky-800/80"></div>
+            <div className="relative z-10 space-y-6">
               <div className="inline-flex items-center gap-2 bg-sky-500/20 text-sky-100 px-4 py-2 rounded-full text-sm font-medium">
                 <Heart size={16} />
                 Welcome to OfficeEase
@@ -55,7 +63,7 @@ const LandingPage = () => {
                 <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
                   <button 
                     onClick={() => navigate("/healthy")}
-                    className="inline-flex items-center gap-3 bg-white text-sky-600 font-semibold px-8 py-4 rounded-xl hover:bg-sky-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                    className="inline-flex items-center gap-3 bg-gradient-to-r from-white to-sky-50 text-sky-600 font-semibold px-8 py-4 rounded-xl hover:from-sky-50 hover:to-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 border border-white/50"
                   >
                     Let's Start
                     <ArrowRight size={20} />
@@ -63,7 +71,7 @@ const LandingPage = () => {
                   
                   <button 
                     onClick={() => setAssistantOpen(true)}
-                    className="inline-flex items-center gap-2 bg-sky-500/20 text-sky-100 border border-sky-400/30 font-medium px-6 py-3 rounded-xl hover:bg-sky-400/30 transition-all duration-300"
+                    className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white border border-white/40 font-medium px-6 py-3 rounded-xl hover:bg-white/30 hover:border-white/60 transition-all duration-300"
                   >
                     <Heart size={18} />
                     Get Help
@@ -78,10 +86,10 @@ const LandingPage = () => {
             {features.map(({ icon: Icon, title, description }, index) => (
               <div 
                 key={title}
-                className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                className="relative bg-white/20 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-white/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/30"
               >
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="bg-sky-100 p-3 rounded-full">
+                  <div className="bg-gradient-to-br from-sky-100 to-orange-100 p-3 rounded-full shadow-md">
                     <Icon className="text-sky-600" size={24} />
                   </div>
                   <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
@@ -93,26 +101,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-800 mb-4">
-              Ready to optimize your workspace?
-            </h2>
-            <p className="text-slate-600 mb-6">
-              Join thousands of professionals who've improved their office health and productivity.
-            </p>
-            <button 
-              onClick={() => navigate("/healthy")}
-              className="inline-flex items-center gap-2 bg-sky-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-sky-700 transition-colors duration-200"
-            >
-              Get Started Now
-              <ArrowRight size={18} />
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Animated Assistant */}
       <AnimatedAssistant

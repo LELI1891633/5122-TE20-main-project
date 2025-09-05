@@ -79,11 +79,11 @@ function CartoonAvatar({ accent = "indigo" }) {
 function Bubble({ children, accent = "indigo", width = 360 }) {
   return (
     <div
-      className="relative"
+      className="relative max-w-[calc(100vw-2rem)] sm:max-w-none"
       style={{ maxWidth: width }}
     >
       <div className="absolute -left-3 top-6 w-0 h-0 border-y-8 border-y-transparent border-r-8 border-r-white" />
-      <div className="rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-4">
+      <div className="rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-3 sm:p-4">
         {children}
       </div>
       <div className={`mt-2 h-1 rounded-full bg-gradient-to-r ${ACCENT_MAP[accent]}`} />

@@ -12,10 +12,12 @@ import {
   Sun,
   Zap
 } from "lucide-react";
+import { AnimatedAssistant } from "../components/AnimatedAssistant";
 
 const EyeHealthAnalysis = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [assistantOpen, setAssistantOpen] = useState(true);
   const [formData, setFormData] = useState({
     ageGroup: "",
     sex: "",
@@ -245,15 +247,20 @@ const EyeHealthAnalysis = () => {
   const isStep1Valid = formData.ageGroup && formData.sex && formData.state && formData.remotenessArea;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-6 px-4 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-sky-50 py-6 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-0 right-1/3 w-80 h-80 bg-gradient-to-br from-orange-200/30 to-pink-200/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-gradient-to-br from-sky-200/30 to-purple-200/30 rounded-full blur-3xl"></div>
+      </div>
       {/* Header */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <div className="max-w-4xl mx-auto mb-8 relative z-10">
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate('/healthy-you')}
-            className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors"
+            className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 text-slate-700 font-medium px-4 py-2 rounded-lg border border-white/30 transition-all duration-200 shadow-sm hover:shadow-md"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={16} />
             Back to Health Tips
           </button>
         </div>
@@ -293,8 +300,8 @@ const EyeHealthAnalysis = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8">
+      <div className="max-w-4xl mx-auto relative z-10">
+        <div className="bg-white/20 backdrop-blur-md rounded-3xl shadow-xl border border-white/30 p-8 hover:bg-white/30 transition-all duration-300">
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep3()}
         </div>
@@ -350,6 +357,24 @@ const EyeHealthAnalysis = () => {
           </div>
         )}
       </div>
+
+      {/* Animated Assistant */}
+      <AnimatedAssistant
+        open={assistantOpen}
+        name="Eye Health Assistant"
+        position="bottom-right"
+        accent="sky"
+        steps={[
+          { text: "Welcome to your eye health assessment! 👁️" },
+          { text: "I'll guide you through the analysis process step by step." },
+          { text: "Fill out the form with your information to get personalized recommendations." },
+          { text: "Your eye health is important - let's keep your vision sharp! 🔍" }
+        ]}
+        onClose={() => setAssistantOpen(false)}
+        onFinish={() => setAssistantOpen(false)}
+        width={380}
+        typingSpeed={25}
+      />
     </div>
   );
 };

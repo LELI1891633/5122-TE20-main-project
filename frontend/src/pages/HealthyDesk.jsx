@@ -10,7 +10,8 @@ import {
   User,
   Eye,
   Coffee,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft
 } from "lucide-react";
 import { analyzeDeskSetup, calculateElbowHeight } from "../scripts/deskAnalyzer";
 import AnalysisLoader from "../components/AnalysisLoader";
@@ -112,7 +113,23 @@ const HealthyDesk = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-6 px-4 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-sky-50 py-6 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-1/4 left-0 w-72 h-72 bg-gradient-to-br from-orange-200/30 to-pink-200/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-gradient-to-br from-sky-200/30 to-purple-200/30 rounded-full blur-3xl"></div>
+      </div>
+      {/* Back Button */}
+      <div className="max-w-7xl mx-auto mb-4 relative z-10">
+        <button
+          onClick={() => navigate("/healthy")}
+          className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 text-slate-700 font-medium px-4 py-2 rounded-lg border border-white/30 transition-all duration-200 shadow-sm hover:shadow-md"
+        >
+          <ArrowLeft size={16} />
+          Back to Health Options
+        </button>
+      </div>
+
       {/* Header */}
       <header className="max-w-7xl mx-auto mb-8">
         <div className="text-center sm:text-left">
@@ -207,7 +224,7 @@ const HealthyDesk = () => {
       </section>      {/* Main Content */}
       <main className={`max-w-7xl mx-auto ${(submitted && !loading) ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : ""}`}>
         {/* Form */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-lg">
+        <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg hover:bg-white/30 transition-all duration-300">
           <form onSubmit={handleSubmit} noValidate className="p-6 sm:p-8">
             <h3 className="text-xl font-semibold text-slate-800 mb-6">Assessment Form</h3>
             
@@ -366,7 +383,7 @@ const HealthyDesk = () => {
 
         {/* Results */}
         {submitted && !loading && analysisResult && (
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-lg p-6 sm:p-8" aria-live="polite">
+          <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg p-6 sm:p-8 hover:bg-white/30 transition-all duration-300" aria-live="polite">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
                 <div className="relative w-20 h-20" role="img" aria-label={`Setup score ${analysisResult.score} percent`}>
