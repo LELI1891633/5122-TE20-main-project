@@ -14,8 +14,13 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-gradient-to-br from-sky-600 to-sky-800 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="relative bg-gradient-to-br from-sky-600 to-sky-800 shadow-lg overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-300/30 to-pink-300/30 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-white/20 to-sky-300/30 rounded-full blur-2xl"></div>
+      </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">

@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import LandingPage from "./pages/LandingPage";
 import HealthyPage from "./pages/HealthyPage";
 import HealthyDesk from "./pages/HealthyDesk";
@@ -11,15 +12,20 @@ import EyeHealthAnalysis from "./pages/EyeHealthAnalysis";
 function App() {
   return (
     <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/healthy" element={<HealthyPage />} />
-        <Route path="/healthy-desk" element={<HealthyDesk />} />
-        <Route path="/healthy-you" element={<HealthyYou />} />
-        <Route path="/health-info" element={<HealthInfo />} />
-        <Route path="/eye-health-analysis" element={<EyeHealthAnalysis />} />
-      </Routes>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/healthy" element={<HealthyPage />} />
+            <Route path="/healthy-desk" element={<HealthyDesk />} />
+            <Route path="/healthy-you" element={<HealthyYou />} />
+            <Route path="/health-info" element={<HealthInfo />} />
+            <Route path="/eye-health-analysis" element={<EyeHealthAnalysis />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
     </Router>
   );
 }
