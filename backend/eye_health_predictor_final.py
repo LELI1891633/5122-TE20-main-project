@@ -84,7 +84,7 @@ def predict_age_based_risk(age_group, models):
         return 50.0
 
 def apply_demographic_adjustments(base_risk, data):
-    """Apply demographic adjustments to base risk"""
+    """Apply demographic adjustments to base risk (only sex-based adjustments)"""
     adjusted_risk = base_risk
     
     # Sex-based adjustments (based on general health statistics)
@@ -94,30 +94,7 @@ def apply_demographic_adjustments(base_risk, data):
     elif sex == 'Female':
         adjusted_risk *= 0.98  # Slightly lower risk for females
     
-    # State-based adjustments (based on healthcare access and demographics)
-    state = data.get('state', '')
-    state_adjustments = {
-        'NSW': 1.02,  # Slightly higher due to urban stress
-        'VIC': 1.00,  # Baseline
-        'QLD': 0.98,  # Slightly lower due to lifestyle
-        'SA': 1.01,   # Slightly higher
-        'WA': 0.99,   # Slightly lower
-        'TAS': 1.03,  # Higher due to aging population
-        'NT': 1.05,   # Higher due to remote healthcare access
-        'ACT': 0.97   # Lower due to high education/income
-    }
-    adjusted_risk *= state_adjustments.get(state, 1.00)
-    
-    # Remoteness-based adjustments
-    remoteness = data.get('remotenessArea', '')
-    remoteness_adjustments = {
-        'Major Cities': 1.01,      # Slightly higher due to pollution/stress
-        'Inner Regional': 1.00,    # Baseline
-        'Outer Regional': 1.02,    # Slightly higher due to limited access
-        'Remote': 1.05,            # Higher due to limited healthcare
-        'Very Remote': 1.08        # Highest due to very limited access
-    }
-    adjusted_risk *= remoteness_adjustments.get(remoteness, 1.00)
+    # Removed state and remoteness adjustments
     
     # Ensure risk stays within reasonable bounds (10-95%)
     adjusted_risk = max(10.0, min(95.0, adjusted_risk))
@@ -125,7 +102,7 @@ def apply_demographic_adjustments(base_risk, data):
     return adjusted_risk
 
 def get_demographic_adjustments(data):
-    """Get information about applied demographic adjustments"""
+    """Get information about applied demographic adjustments (only sex)"""
     adjustments = {}
     
     sex = data.get('sex', '')
@@ -135,27 +112,7 @@ def get_demographic_adjustments(data):
             'adjustment': '1.05x' if sex == 'Male' else '0.98x' if sex == 'Female' else '1.00x'
         }
     
-    state = data.get('state', '')
-    if state:
-        state_adjustments = {
-            'NSW': '1.02x', 'VIC': '1.00x', 'QLD': '0.98x', 'SA': '1.01x',
-            'WA': '0.99x', 'TAS': '1.03x', 'NT': '1.05x', 'ACT': '0.97x'
-        }
-        adjustments['state'] = {
-            'value': state,
-            'adjustment': state_adjustments.get(state, '1.00x')
-        }
-    
-    remoteness = data.get('remotenessArea', '')
-    if remoteness:
-        remoteness_adjustments = {
-            'Major Cities': '1.01x', 'Inner Regional': '1.00x', 'Outer Regional': '1.02x',
-            'Remote': '1.05x', 'Very Remote': '1.08x'
-        }
-        adjustments['remoteness'] = {
-            'value': remoteness,
-            'adjustment': remoteness_adjustments.get(remoteness, '1.00x')
-        }
+    # Removed state and remoteness adjustments
     
     return adjustments
 
@@ -202,11 +159,7 @@ def generate_eye_health_recommendations(input_data, prediction_result):
     else:
         recommendations.append("Maintain current healthy eye habits and continue preventive measures")
     
-    # Location-based recommendations
-    remoteness = input_data.get('remotenessArea', '')
-    if remoteness in ['Remote', 'Very Remote']:
-        recommendations.append("Plan ahead for eye care appointments due to limited local access")
-        recommendations.append("Consider telehealth options for initial consultations")
+    # Removed location-based recommendations
     
     # General recommendations
     recommendations.append("Maintain a balanced diet rich in eye-healthy nutrients (vitamins A, C, E, zinc, omega-3)")
@@ -236,9 +189,7 @@ def main():
         if not input_data:
             input_data = {
                 "ageGroup": "25–34",
-                "sex": "Male",
-                "state": "VIC",
-                "remotenessArea": "Major Cities"
+                "sex": "Male"
             }
         
         models = load_eye_models()

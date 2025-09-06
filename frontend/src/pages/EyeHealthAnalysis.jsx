@@ -21,31 +21,134 @@ const EyeHealthAnalysis = () => {
   const [formData, setFormData] = useState({
     ageGroup: "",
     sex: "",
-    state: "",
-    remotenessArea: ""
+    screenTime: 8
   });
   const [analysisResult, setAnalysisResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showReminder, setShowReminder] = useState(false);
+  const [timerMinutes, setTimerMinutes] = useState(20);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [timerAlert, setTimerAlert] = useState(false);
 
   const ageGroups = [
     "0–14", "15–24", "25–34", "35–44", "45–54", "55–64", "65–74", "75–84", "85+"
   ];
 
   const sexes = ["Male", "Female", "Persons"];
-  
-  const states = [
-    "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"
-  ];
-
-  const remotenessAreas = [
-    "Major Cities", "Inner Regional", "Outer Regional", "Remote", "Very Remote"
-  ];
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleReminderClick = () => {
+    setShowReminder(true);
+    // Auto-hide reminder after 3 seconds
+    setTimeout(() => {
+      setShowReminder(false);
+    }, 3000);
+  };
+
+  // Timer related functions
+  const startTimer = () => {
+    if (timeLeft === 0) {
+      setTimeLeft(timerMinutes * 60);
+    }
+    setIsTimerRunning(true);
+    setTimerAlert(false);
+  };
+
+  const stopTimer = () => {
+    setIsTimerRunning(false);
+  };
+
+  const resetTimer = () => {
+    setIsTimerRunning(false);
+    setTimeLeft(0);
+    setTimerAlert(false);
+  };
+
+  // Countdown effect
+  React.useEffect(() => {
+    let interval = null;
+    if (isTimerRunning && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(timeLeft => timeLeft - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && isTimerRunning) {
+      setIsTimerRunning(false);
+      setTimerAlert(true);
+      // Play notification sound (if browser supports)
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Time\'s up!', {
+          body: 'Time to get up and move around!',
+          icon: '/favicon.ico'
+        });
+      }
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, timeLeft]);
+
+  // Request notification permission
+  React.useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // Save timer state to localStorage
+  React.useEffect(() => {
+    const timerState = {
+      timeLeft,
+      isTimerRunning,
+      timerMinutes,
+      timerAlert,
+      startTime: isTimerRunning ? Date.now() : null
+    };
+    localStorage.setItem('eyeHealthTimer', JSON.stringify(timerState));
+  }, [timeLeft, isTimerRunning, timerMinutes, timerAlert]);
+
+  // Restore timer state from localStorage
+  React.useEffect(() => {
+    const savedTimer = localStorage.getItem('eyeHealthTimer');
+    if (savedTimer) {
+      try {
+        const timerState = JSON.parse(savedTimer);
+        setTimerMinutes(timerState.timerMinutes || 20);
+        setTimerAlert(timerState.timerAlert || false);
+        
+        if (timerState.isTimerRunning && timerState.startTime) {
+          // Calculate elapsed time
+          const elapsed = Math.floor((Date.now() - timerState.startTime) / 1000);
+          const remaining = Math.max(0, timerState.timeLeft - elapsed);
+          
+          if (remaining > 0) {
+            setTimeLeft(remaining);
+            setIsTimerRunning(true);
+          } else {
+            // Time's up, show alert
+            setTimeLeft(0);
+            setIsTimerRunning(false);
+            setTimerAlert(true);
+          }
+        } else {
+          setTimeLeft(timerState.timeLeft || 0);
+          setIsTimerRunning(false);
+        }
+      } catch (error) {
+        console.error('Error loading timer state:', error);
+      }
+    }
+  }, []);
+
+  // Format time display
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
 
@@ -114,32 +217,60 @@ const EyeHealthAnalysis = () => {
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">State/Territory</label>
-          <select
-            value={formData.state}
-            onChange={(e) => handleInputChange('state', e.target.value)}
-            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select state/territory</option>
-            {states.map(state => (
-              <option key={state} value={state}>{state}</option>
-            ))}
-          </select>
-        </div>
+      </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Remoteness Area</label>
-          <select
-            value={formData.remotenessArea}
-            onChange={(e) => handleInputChange('remotenessArea', e.target.value)}
-            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select remoteness area</option>
-            {remotenessAreas.map(area => (
-              <option key={area} value={area}>{area}</option>
-            ))}
-          </select>
+      {/* Screen Time Slider */}
+      <div className="mt-6">
+        <label className="block text-sm font-medium text-slate-700 mb-3">
+          <Monitor className="inline w-4 h-4 mr-2" />
+          Daily Screen Time (Hours)
+        </label>
+        <div className="bg-white rounded-lg p-4 border border-slate-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-slate-600">0 hours</span>
+            <span className="text-lg font-semibold text-blue-600">
+              {formData.screenTime} {formData.screenTime === 1 ? 'hour' : 'hours'}
+            </span>
+            <span className="text-sm text-slate-600">16+ hours</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="16"
+            step="0.5"
+            value={formData.screenTime}
+            onChange={(e) => handleInputChange('screenTime', parseFloat(e.target.value))}
+            className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider"
+            style={{
+              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(formData.screenTime / 16) * 100}%, #e2e8f0 ${(formData.screenTime / 16) * 100}%, #e2e8f0 100%)`
+            }}
+          />
+          <style jsx>{`
+            .slider::-webkit-slider-thumb {
+              appearance: none;
+              height: 20px;
+              width: 20px;
+              border-radius: 50%;
+              background: #3b82f6;
+              cursor: pointer;
+              border: 2px solid #ffffff;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+            .slider::-moz-range-thumb {
+              height: 20px;
+              width: 20px;
+              border-radius: 50%;
+              background: #3b82f6;
+              cursor: pointer;
+              border: 2px solid #ffffff;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+          `}</style>
+          <div className="flex justify-between text-xs text-slate-500 mt-1">
+            <span>Light use</span>
+            <span>Moderate</span>
+            <span>Heavy use</span>
+          </div>
         </div>
       </div>
     </div>
@@ -158,7 +289,7 @@ const EyeHealthAnalysis = () => {
 
       {analysisResult && (
         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="text-center">
               <div className="bg-blue-100 p-4 rounded-full w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                 <Eye className="text-blue-600" size={24} />
@@ -186,9 +317,71 @@ const EyeHealthAnalysis = () => {
                 {analysisResult.confidence || 'High'}
               </p>
             </div>
+
+            <div className="text-center">
+              <div className="bg-purple-100 p-4 rounded-full w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                <Monitor className="text-purple-600" size={24} />
+              </div>
+              <h3 className="font-semibold text-slate-800 mb-1">Screen Time Impact</h3>
+              <p className="text-sm font-bold text-purple-600">
+                {formData.screenTime} {formData.screenTime === 1 ? 'hour' : 'hours'}/day
+              </p>
+              {analysisResult.screen_time_impact && (
+                <p className="text-xs text-slate-600 mt-1">
+                  {analysisResult.screen_time_impact}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="space-y-6">
+            {/* Screen Time Impact Analysis */}
+            <div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                <Monitor className="text-purple-600" size={20} />
+                Screen Time Impact Analysis
+              </h3>
+              <div className="bg-purple-50 rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-slate-800 mb-2">Your Current Screen Time</h4>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-purple-500 transition-all duration-300"
+                          style={{ width: `${Math.min((formData.screenTime / 16) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm font-semibold text-purple-600">
+                        {formData.screenTime} hours
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-slate-800 mb-2">Risk Assessment</h4>
+                    <div className="flex items-center gap-2">
+                      {formData.screenTime <= 6 ? (
+                        <span className="text-green-600 text-sm font-medium">✅ Low Risk</span>
+                      ) : formData.screenTime <= 8 ? (
+                        <span className="text-yellow-600 text-sm font-medium">⚠️ Moderate Risk</span>
+                      ) : formData.screenTime <= 10 ? (
+                        <span className="text-orange-600 text-sm font-medium">🔶 High Risk</span>
+                      ) : (
+                        <span className="text-red-600 text-sm font-medium">🚨 Critical Risk</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {analysisResult.screen_time_impact && (
+                  <div className="mt-3 p-3 bg-white rounded-lg border border-purple-200">
+                    <p className="text-sm text-slate-700">
+                      <strong>Impact:</strong> {analysisResult.screen_time_impact}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div>
               <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
                 <Info className="text-blue-600" size={20} />
@@ -202,10 +395,10 @@ const EyeHealthAnalysis = () => {
                       <span className="text-slate-700">{rec}</span>
                     </li>
                   )) || [
-                    "遵循20-20-20规则：每20分钟看20英尺外的物体20秒",
-                    "调整显示器亮度与周围环境匹配",
-                    "保持显示器距离眼睛50-70厘米",
-                    "定期进行眼部检查"
+                    "Follow the 20-20-20 rule: Look at something 20 feet away for 20 seconds every 20 minutes",
+                    "Adjust monitor brightness to match your surroundings",
+                    "Keep your monitor 50-70 cm away from your eyes",
+                    "Schedule regular eye examinations"
                   ].map((rec, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <CheckCircle className="text-blue-600 mt-0.5 flex-shrink-0" size={16} />
@@ -238,15 +431,192 @@ const EyeHealthAnalysis = () => {
                 </ul>
               </div>
             </div>
+
+            {/* Reminder Section */}
+            <div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                <Clock className="text-orange-600" size={20} />
+                Health Reminder
+              </h3>
+              <div className="bg-orange-50 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-slate-700 mb-2">Take a break and refresh your mind!</p>
+                    <button
+                      onClick={handleReminderClick}
+                      className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <Sun className="w-4 h-4" />
+                      Get Reminder
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Reminder Message */}
+                {showReminder && (
+                  <div className="mt-4 p-3 bg-green-100 border border-green-200 rounded-lg fade-in">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="text-green-600 w-5 h-5" />
+                      <span className="text-green-800 font-medium">
+                        Time to step outside for fresh air! 🌿
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Timer Section */}
+            <div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                <Activity className="text-purple-600" size={20} />
+                Break Timer
+              </h3>
+              <div className="bg-purple-50 rounded-lg p-4">
+                {/* Timer Display */}
+                <div className="text-center mb-4">
+                  <div className="text-4xl font-mono font-bold text-purple-600 mb-2">
+                    {formatTime(timeLeft)}
+                  </div>
+                  <p className="text-slate-600 text-sm">
+                    {isTimerRunning ? 'Countdown in progress...' : timeLeft === 0 ? 'Ready to start' : 'Paused'}
+                  </p>
+                </div>
+
+                {/* Timer Slider */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Set reminder time (minutes)
+                  </label>
+                  <div className="bg-white rounded-lg p-3 border border-slate-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-slate-600">5 min</span>
+                      <span className="text-lg font-semibold text-purple-600">
+                        {timerMinutes} min
+                      </span>
+                      <span className="text-sm text-slate-600">60 min</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="5"
+                      max="60"
+                      step="5"
+                      value={timerMinutes}
+                      onChange={(e) => setTimerMinutes(parseInt(e.target.value))}
+                      disabled={isTimerRunning}
+                      className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer timer-slider"
+                      style={{
+                        background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${((timerMinutes - 5) / 55) * 100}%, #e2e8f0 ${((timerMinutes - 5) / 55) * 100}%, #e2e8f0 100%)`
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Timer Controls */}
+                <div className="flex gap-2 justify-center">
+                  {!isTimerRunning ? (
+                    <button
+                      onClick={startTimer}
+                      className="inline-flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <Activity className="w-4 h-4" />
+                      {timeLeft === 0 ? 'Start Timer' : 'Resume Timer'}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={stopTimer}
+                      className="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <Clock className="w-4 h-4" />
+                      Pause
+                    </button>
+                  )}
+                  
+                  <button
+                    onClick={resetTimer}
+                    className="inline-flex items-center gap-2 bg-slate-500 hover:bg-slate-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+                  >
+                    <Zap className="w-4 h-4" />
+                    Reset
+                  </button>
+                </div>
+
+                {/* Timer Alert */}
+                {timerAlert && (
+                  <div className="mt-4 p-4 bg-red-100 border border-red-200 rounded-lg fade-in">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="text-red-600 w-5 h-5" />
+                      <span className="text-red-800 font-medium">
+                        Time's up! Time to get up and move around! 🏃‍♂️
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setTimerAlert(false)}
+                      className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+                    >
+                      Close Alert
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 
-  const isStep1Valid = formData.ageGroup && formData.sex && formData.state && formData.remotenessArea;
+  const isStep1Valid = formData.ageGroup && formData.sex && formData.screenTime !== null;
 
   return (
+    <>
+      <style jsx>{`
+        .fade-in {
+          animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .timer-slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #8b5cf6;
+          cursor: pointer;
+          border: 2px solid #ffffff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .timer-slider::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #8b5cf6;
+          cursor: pointer;
+          border: 2px solid #ffffff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .timer-slider:disabled::-webkit-slider-thumb {
+          background: #9ca3af;
+          cursor: not-allowed;
+        }
+
+        .timer-slider:disabled::-moz-range-thumb {
+          background: #9ca3af;
+          cursor: not-allowed;
+        }
+      `}</style>
     <div className="relative min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-sky-50 py-6 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-20">
@@ -323,8 +693,7 @@ const EyeHealthAnalysis = () => {
                 setFormData({
                   ageGroup: "",
                   sex: "",
-                  state: "",
-                  remotenessArea: ""
+                  screenTime: 8
                 });
                 setAnalysisResult(null);
               }}
@@ -376,6 +745,7 @@ const EyeHealthAnalysis = () => {
         typingSpeed={25}
       />
     </div>
+    </>
   );
 };
 
