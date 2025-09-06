@@ -8,6 +8,7 @@ import HealthyDesk from "./pages/HealthyDesk";
 import HealthyYou from "./pages/HealthyYou";
 import HealthInfo from "./pages/HealthInfo";
 import EyeHealthAnalysis from "./pages/EyeHealthAnalysis";
+import VitaminDReminder from "./pages/VitaminDReminder";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/healthy-you" element={<HealthyYou />} />
             <Route path="/health-info" element={<HealthInfo />} />
             <Route path="/eye-health-analysis" element={<EyeHealthAnalysis />} />
+            <Route path="/vitamin-d-reminder" element={<VitaminDReminder />} />
           </Routes>
         </main>
         <Footer />

@@ -155,9 +155,9 @@ const HealthyYou = () => {
                   ))}
                 </div>
                 
-                {/* Action Button for Eye Health */}
-                {title === "Eye Health" && (
-                  <div className="mt-6 flex justify-end">
+                {/* Action Buttons */}
+                <div className="mt-6 flex justify-end gap-3">
+                  {title === "Eye Health" && (
                     <button
                       onClick={() => navigate("/eye-health-analysis")}
                       className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
@@ -165,8 +165,18 @@ const HealthyYou = () => {
                       Start Analysis
                       <ArrowRight size={16} />
                     </button>
-                  </div>
-                )}
+                  )}
+                  
+                  {title === "Vitamin D" && (
+                    <button
+                      onClick={() => navigate("/vitamin-d-reminder")}
+                      className="inline-flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                    >
+                      Set Reminders
+                      <ArrowRight size={16} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

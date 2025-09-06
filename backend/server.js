@@ -118,15 +118,21 @@ app.get('/api/wellness/options', (req, res) => {
   });
 });
 
-// Run enhanced eye health prediction script
+// Run enhanced eye health prediction script with screen time support
 function runEyeHealthPrediction(eyeData) {
   return new Promise((resolve, reject) => {
     console.log('👁️ Starting enhanced eye health prediction with data:', JSON.stringify(eyeData, null, 2));
 
-    const pythonScript = path.join(__dirname, 'eye_health_predictor_final.py');
+    // Use screen time model if screenTime is provided
+    const hasScreenTime = eyeData.screenTime !== undefined && eyeData.screenTime !== null;
+    const pythonScript = hasScreenTime 
+      ? path.join(__dirname, 'eye_health_predictor_screentime.py')
+      : path.join(__dirname, 'eye_health_predictor_final.py');
+    
     const inputFile = path.join(__dirname, 'temp_eye_input.json');
-    console.log('🐍 Enhanced eye health script path:', pythonScript);
+    console.log('🐍 Eye health script path:', pythonScript);
     console.log('📄 Input file path:', inputFile);
+    console.log('⏰ Screen time data included:', hasScreenTime);
     
     // Write input data to temporary file
     const fs = require('fs');
